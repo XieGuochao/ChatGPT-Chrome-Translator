@@ -9,7 +9,7 @@ const historyDiv = document.createElement("div");
 historyDiv.id = "chatgpt-history";
 
 const showButton = document.createElement("button");
-showButton.innerHTML = "Ask ChatGPT";
+showButton.innerHTML = "Translate";
 showButton.style.position = "fixed";
 showButton.style.backgroundColor = "blue";
 showButton.style.color = "white";
@@ -21,7 +21,7 @@ let isAsking = false;
 document.addEventListener("mouseup", function(event) {
     const text = window.getSelection().toString();
     if (text.length == 0) {
-        showButton.innerHTML = "Ask ChatGPT";
+        showButton.innerHTML = "Translate";
         showButton.style.display = "none";
         historyDiv.style.display = "none";
         return;
@@ -64,7 +64,7 @@ async function askChatGPT(text) {
     const account = await loadGPTAccountFromStorage();
     const chat = new GPTChat(account);
     showButton.innerHTML = "Asking ChatGPT...";
-    await chat.ask(text, {}, updateHistoryUI);
+    await chat.ask(text);
     showButton.innerHTML = "Click blank space to close";
     console.log("Chat History:", chat.getHistory());
     updateHistoryUI(chat);
@@ -75,7 +75,14 @@ showButton.onclick = async function() {
     if (text.length == 0) {
         return;
     }
-    askChatGPT(text);
+
+    const queryText = `
+Translate the following text.
+Target language: ${await loadLanguage()}
+Text: ${text}
+
+Translation:`
+    askChatGPT(queryText);
 }
 
 async function updateHistoryUI(chat) {
@@ -83,8 +90,11 @@ async function updateHistoryUI(chat) {
     historyDiv.style.left = showButton.style.left;
     historyDiv.style.top = `${parseInt(showButton.style.top) + 30}px`;
     for (const item of chat.getHistory()) {
+        if (item["role"] == "user") {
+            continue;
+        }
         const p = document.createElement("p");
-        p.innerHTML = `${item["role"]}: ${item["content"]}`
+        p.innerHTML = `${item["content"]}`
         historyDiv.appendChild(p);
     }
     historyDiv.style.display = "block";

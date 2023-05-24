@@ -3,14 +3,6 @@
  * Date: 19-05-2023
  */
 
-function updateStatus(message) {
-    const status = document.getElementById('status');
-    status.textContent = `Status: ${message}`;
-    setTimeout(() => {
-      status.textContent = '';
-    }, 1000);
-};
-
 const saveOptions = async () => {
     const org = document.getElementById('org').value;
     const token = document.getElementById('token').value;
@@ -76,7 +68,11 @@ const updateDefaultModel = async () => {
     updateStatus("Default model saved.")
 }
 
+
 document.addEventListener('DOMContentLoaded', restoreOptions);
 document.getElementById('save').addEventListener('click', saveOptions);
 document.getElementById('reset').addEventListener('click', resetOptions);
 document.getElementById('save-model').addEventListener('click', updateDefaultModel);
+document.getElementById('save-language').addEventListener('click', updateDefaultLanguage);
+
+refreshLanguage();

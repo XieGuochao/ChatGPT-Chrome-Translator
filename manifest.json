@@ -1,15 +1,15 @@
 {
     "manifest_version": 3,
-    "name": "ChatGPT Extension",
-    "description": "A quick-start template for building extensions for Google Chrome.",
+    "name": "ChatGPT Translator",
+    "description": "ChatGPT-based Translator.",
     "version": "1.0",
     "action": {
       "default_popup": "src/index.html"
     },
     "content_scripts": [
       {
-        "js": ["./chatgpt.js", "scripts/authentication.js", "scripts/selection-action.js"],
-        "matches": ["https://*.wikipedia.org/**"]
+        "js": ["./chatgpt.js", "./utils.js", "scripts/authentication.js", "scripts/selection-action.js"],
+        "matches": ["<all_urls>"]
       }
     ],
     "options_page": "src/options.html",
