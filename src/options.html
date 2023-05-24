@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Options</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>ChatGPT Chrome Extension Options</h1>
+    <div id="credential">
+        <input class="credential" type="text" id="org" placeholder="Organization">
+        <input class="credential" type="password" id="token" placeholder="Token">
+
+        <button id="save">Save and Login</button>
+        <button id="reset">Reset</button>
+    </div>
+
+    <div id="model-selection">
+        <select id="models">
+
+        </select>
+        <button id="save-model">Save Default Model</button>
+    </div>
+
+    <div id="status"></div>
+
+    <script src="../chatgpt.js"></script>
+    <script src="./options.js"></script>
+</body>
+
+</html>
