@@ -6,12 +6,12 @@
 
 console.log("authentication.js loaded.");
 
-const getModels = async () => {
-    const account = await loadGPTAccountFromStorage();
-    const models = await account.getModels();
-    
+async function init_authentication() {
+    const account = new OAccount();
+    await account.load();
+    const models = await account.models().list();
     console.log("ChatGPT authentication succeeded.");
     console.log("ChatGPT models:", models);
-}
+};
 
-getModels();
+init_authentication();

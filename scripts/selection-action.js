@@ -5,100 +5,117 @@
  */
 
 // Add a hidden div to the page
-const historyDiv = document.createElement("div");
-historyDiv.id = "chatgpt-history";
+const history_div = document.createElement("div");
+history_div.id = "chatgpt-history";
 
-const showButton = document.createElement("button");
-showButton.innerHTML = "Translate";
-showButton.style.position = "fixed";
-showButton.style.backgroundColor = "blue";
-showButton.style.color = "white";
-showButton.style.display = "none";
-showButton.style.margin = "20px";
-document.body.appendChild(showButton);
+const show_button = document.createElement("button");
+show_button.innerHTML = "Ask ChatGPT";
+show_button.style.position = "fixed";
+show_button.style.backgroundColor = "blue";
+show_button.style.color = "white";
+show_button.style.display = "none";
+show_button.style.margin = "20px";
+document.body.appendChild(show_button);
 
-let isAsking = false;
-document.addEventListener("mouseup", function(event) {
+let is_asking = false;
+function eventHandler(event) {
     const text = window.getSelection().toString();
     if (text.length == 0) {
-        showButton.innerHTML = "Translate";
-        showButton.style.display = "none";
-        historyDiv.style.display = "none";
+        show_button.innerHTML = "Ask ChatGPT";
+        show_button.style.display = "none";
+        history_div.style.display = "none";
+        is_asking = false;
         return;
     }
-    if (isAsking) {
+    // console.log("Selected text:", text);
+    if (is_asking) {
         return;
     }
-    const mousePosition = {
-        x: event.clientX,
-        y: event.clientY
-    };
-    let x = mousePosition.x + 10;
-    let y = mousePosition.y + 20;
-    if (x + 500 > window.innerWidth) {
-        x = window.innerWidth - 500;
+
+    if (event.clientX !== undefined && event.clientY !== undefined) {
+        const mousePosition = {
+            x: event.clientX,
+            y: event.clientY
+        };
+        let x = mousePosition.x + 10;
+        let y = mousePosition.y + 20;
+        if (x + 500 > window.innerWidth) {
+            x = window.innerWidth - 500;
+        }
+        if (y + 500 > window.innerHeight) {
+            y = window.innerHeight - 500;
+        }
+
+        show_button.style.display = "block";
+        show_button.style.left = `${x}px`;
+        show_button.style.top = `${y}px`;
+        is_asking = true;
     }
-    if (y + 500 > window.innerHeight) {
-        y = window.innerHeight - 500;
-    }
+}
 
-    showButton.style.display = "block";
-    showButton.style.left = `${x}px`;
-    showButton.style.top = `${y}px`;
-    isAsking = true;
-});
+document.addEventListener("mouseup", eventHandler);
+document.addEventListener("keyup", eventHandler);
+document.addEventListener("selectionchange", eventHandler);
 
 
-historyDiv.style.display = "none";
-historyDiv.style.position = "fixed";
-historyDiv.style.width = "500px";
-historyDiv.style.backgroundColor = "white";
-historyDiv.style.margin = "20px";
-historyDiv.style.padding = "20px";
-historyDiv.style.border = "1px solid black";
-historyDiv.style.borderRadius = "10px";
+history_div.style.display = "none";
+history_div.style.position = "fixed";
+history_div.style.width = "500px";
+history_div.style.backgroundColor = "white";
+history_div.style.margin = "20px";
+history_div.style.padding = "20px";
+history_div.style.border = "1px solid black";
+history_div.style.borderRadius = "10px";
 
-document.body.appendChild(historyDiv);
+document.body.appendChild(history_div);
 
 async function askChatGPT(text) {
-    const account = await loadGPTAccountFromStorage();
-    const chat = new GPTChat(account);
-    showButton.innerHTML = "Asking ChatGPT...";
-    await chat.ask(text);
-    showButton.innerHTML = "Click blank space to close";
-    console.log("Chat History:", chat.getHistory());
-    updateHistoryUI(chat);
+    const account = new OAccount();
+    await account.load()
+    const chat = new OChat(account);
+    show_button.innerHTML = "Asking ChatGPT...";
+    const [_, errorcode, error_message] = await chat.ask(text, "user", {}, update_history_ui, update_status_error);
+    is_asking = false;
+    if (errorcode != 0) {
+        show_button.innerHTML = "Error. Please try again.";
+        setTimeout(() => {
+            show_button.innerHTML = "Ask ChatGPT";
+        }, 2000);
+        return;
+    }
+    show_button.innerHTML = "Click blank space to close";
+    console.log("Chat History:", chat.history);
+    update_history_ui(chat);
 } 
 
-showButton.onclick = async function() {
+show_button.onclick = async function() {
     const text = window.getSelection().toString();
     if (text.length == 0) {
         return;
     }
-
+    const language = await new Language().load();
     const queryText = `
 Translate the following text.
-Target language: ${await loadLanguage()}
+Target language: ${language.language}
 Text: ${text}
 
 Translation:`
     askChatGPT(queryText);
 }
 
-async function updateHistoryUI(chat) {
-    historyDiv.innerHTML = "";
-    historyDiv.style.left = showButton.style.left;
-    historyDiv.style.top = `${parseInt(showButton.style.top) + 30}px`;
-    for (const item of chat.getHistory()) {
+async function update_history_ui(chat) {
+    history_div.innerHTML = "";
+    history_div.style.left = show_button.style.left;
+    history_div.style.top = `${parseInt(show_button.style.top) + 30}px`;
+    for (const item of chat.history.history) {
         if (item["role"] == "user") {
             continue;
         }
         const p = document.createElement("p");
-        p.innerHTML = `${item["content"]}`
-        historyDiv.appendChild(p);
+        p.innerHTML = `${item["role"]}: ${item["content"]}`
+        history_div.appendChild(p);
     }
-    historyDiv.style.display = "block";
-    isAsking = false;
+    history_div.style.display = "block";
 }
 
 console.log("selection-action.js loaded.");
