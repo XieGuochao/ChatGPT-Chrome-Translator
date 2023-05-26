@@ -9,7 +9,7 @@ const history_div = document.createElement("div");
 history_div.id = "chatgpt-history";
 
 const show_button = document.createElement("button");
-show_button.innerHTML = "Ask ChatGPT";
+show_button.innerHTML = "Translate";
 show_button.style.position = "fixed";
 show_button.style.backgroundColor = "blue";
 show_button.style.color = "white";
@@ -21,7 +21,7 @@ let is_asking = false;
 function eventHandler(event) {
     const text = window.getSelection().toString();
     if (text.length == 0) {
-        show_button.innerHTML = "Ask ChatGPT";
+        show_button.innerHTML = "Translate";
         show_button.style.display = "none";
         history_div.style.display = "none";
         is_asking = false;
@@ -73,13 +73,13 @@ async function askChatGPT(text) {
     const account = new OAccount();
     await account.load()
     const chat = new OChat(account);
-    show_button.innerHTML = "Asking ChatGPT...";
+    show_button.innerHTML = "Translating with ChatGPT...";
     const [_, errorcode, error_message] = await chat.ask(text, "user", {}, update_history_ui, update_status_error);
     is_asking = false;
     if (errorcode != 0) {
         show_button.innerHTML = "Error. Please try again.";
         setTimeout(() => {
-            show_button.innerHTML = "Ask ChatGPT";
+            show_button.innerHTML = "Translate";
         }, 2000);
         return;
     }
