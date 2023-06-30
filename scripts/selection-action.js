@@ -14,7 +14,9 @@ show_button.style.position = "fixed";
 show_button.style.backgroundColor = "blue";
 show_button.style.color = "white";
 show_button.style.display = "none";
-show_button.style.margin = "20px";
+show_button.style.padding = "8px";
+show_button.style.borderRadius = "5px";
+show_button.style.fontSize = "16px";
 document.body.appendChild(show_button);
 
 let is_asking = false;
@@ -62,10 +64,11 @@ history_div.style.display = "none";
 history_div.style.position = "fixed";
 history_div.style.width = "500px";
 history_div.style.backgroundColor = "white";
-history_div.style.margin = "20px";
-history_div.style.padding = "20px";
+history_div.style.padding = "8px";
+history_div.style.marginTop = "16px";
 history_div.style.border = "1px solid black";
-history_div.style.borderRadius = "10px";
+history_div.style.borderRadius = "5px";
+history_div.style.fontSize = "16px";
 
 document.body.appendChild(history_div);
 
@@ -112,7 +115,7 @@ async function update_history_ui(chat) {
             continue;
         }
         const p = document.createElement("p");
-        p.innerHTML = `${item["role"]}: ${item["content"]}`
+        p.innerHTML = `${item["content"]} <br>`
         history_div.appendChild(p);
     }
     history_div.style.display = "block";
