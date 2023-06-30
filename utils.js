@@ -51,7 +51,6 @@ async function save_options(org, api_key, default_model) {
     );
     await new_account.save();
     
-    update_status("Options saved.", new_account);
     const [models, errorcode, error_message] = await new_account.models().list();
     if (errorcode != 0) {
         update_status(`Error: ${error_message}`);

@@ -11,12 +11,14 @@ document.addEventListener('DOMContentLoaded', async() => {
     }
     update_options_ui(account, models);
 });
+
 document.getElementById('save').addEventListener('click', () => {
     const components = ui_components();
     save_options(
         components.org.value,
         components.api_key.value,
     );
+    update_status("Options saved.");
 });
 
 document.getElementById('reset').addEventListener('click', reset_options);
