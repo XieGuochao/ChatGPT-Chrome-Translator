@@ -9,27 +9,53 @@ const history_div = document.createElement("div");
 history_div.id = "chatgpt-history";
 
 const show_button = document.createElement("button");
-show_button.innerHTML = "Translate";
-show_button.style.position = "fixed";
-show_button.style.backgroundColor = "blue";
-show_button.style.color = "white";
-show_button.style.display = "none";
-show_button.style.padding = "8px";
-show_button.style.borderRadius = "5px";
-show_button.style.fontSize = "16px";
+function reset_show_button(show_button) {
+    show_button.innerHTML = "Translate";
+    show_button.style.position = "fixed";
+    show_button.style.backgroundColor = "#0d6efd";
+    show_button.style.border = "none";
+    show_button.style.color = "white";
+    show_button.style.display = "none";
+    show_button.style.padding = "8px";
+    show_button.style.borderRadius = "5px";
+    show_button.style.fontSize = "16px";
+    show_button.disabled = false;
+}
+
+function show_show_button(show_button) {
+    show_button.style.display = "block";
+}
+
+function asking_show_button(show_button) {
+    show_button.innerHTML = "Asking ChatGPT ...";
+    show_button.style.backgroundColor = "#28a745";
+    show_button.disabled = true;
+}
+
+function error_show_button(show_button) {
+    show_button.innerHTML = "Error. Please try again.";
+    show_button.style.backgroundColor = "#dc3545";
+    show_button.disabled = false;
+}
+
+function close_show_button(show_button) {
+    show_button.innerHTML = "Click blank space to close";
+    show_button.style.backgroundColor = "#6c757d";
+}
+
+reset_show_button(show_button);
+
 document.body.appendChild(show_button);
 
 let is_asking = false;
 function eventHandler(event) {
     const text = window.getSelection().toString();
     if (text.length == 0) {
-        show_button.innerHTML = "Translate";
-        show_button.style.display = "none";
+        reset_show_button(show_button);
         history_div.style.display = "none";
         is_asking = false;
         return;
     }
-    // console.log("Selected text:", text);
     if (is_asking) {
         return;
     }
@@ -48,10 +74,11 @@ function eventHandler(event) {
             y = window.innerHeight - 500;
         }
 
-        show_button.style.display = "block";
         show_button.style.left = `${x}px`;
         show_button.style.top = `${y}px`;
         is_asking = true;
+        reset_show_button(show_button);
+        show_show_button(show_button);
     }
 }
 
@@ -76,17 +103,20 @@ async function askChatGPT(text) {
     const account = new OAccount();
     await account.load()
     const chat = new OChat(account);
-    show_button.innerHTML = "Translating with ChatGPT...";
+    asking_show_button(show_button);
+
     const [_, errorcode, error_message] = await chat.ask(text, "user", {}, update_history_ui, update_status_error);
     is_asking = false;
     if (errorcode != 0) {
-        show_button.innerHTML = "Error. Please try again.";
+        error_show_button(show_button);
+
         setTimeout(() => {
-            show_button.innerHTML = "Translate";
+            reset_show_button(show_button);
         }, 2000);
         return;
     }
-    show_button.innerHTML = "Click blank space to close";
+    close_show_button(show_button);
+
     console.log("Chat History:", chat.history);
     update_history_ui(chat);
 } 

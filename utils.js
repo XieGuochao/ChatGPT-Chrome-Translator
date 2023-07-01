@@ -92,11 +92,12 @@ function update_model_list(model_list, default_model, model_list_ui) {
     for (const model of model_list) {
         const option = document.createElement('option');
         option.value = model["id"];
-        option.text = `${model["id"]}`; // Here you can add more information about the model
-        option.classList.add(model["owned_by"]); // More class can be added here
+        option.text = `${model["id"]} - ${model["type"]}`; // Here you can add more information about the model
+        option.classList.add(model["owned_by"], model["type"]); // More class can be added here
         if (model["id"] == default_model) {
             option.selected = true;
         }
+        option.disabled = model["type"] != "CHAT"; // We will only use the chat model
         model_list_ui.appendChild(option);
     }
 }
